@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://redact-pdf.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://redact-pdf-phi.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return { rules: [{ userAgent: "*", allow: "/" }], sitemap: `${SITE}/sitemap.xml` };

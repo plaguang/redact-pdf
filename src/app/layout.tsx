@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://redact-pdf.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://redact-pdf-phi.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
