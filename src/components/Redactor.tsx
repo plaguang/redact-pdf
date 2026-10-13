@@ -16,6 +16,14 @@ const PATTERNS: { name: string; re: RegExp }[] = [
   { name: "Card", re: /\b(?:\d[ -]?){13,16}\b/g },
 ];
 
+// 用离屏 canvas 测量文字宽度（无衬线字体近似 PDF 常见字体）
+let measureCtx: CanvasRenderingContext2D | null = null;
+function measure(s: string) {
+  measureCtx ??= document.createElement("canvas").getContext("2d")!;
+  measureCtx.font = "100px Helvetica, Arial, sans-serif";
+  return measureCtx.measureText(s).width;
+}
+
 export default function Redactor() {
   const [pages, setPages] = useState<Page[]>([]);
   const [busy, setBusy] = useState("");
@@ -50,14 +58,17 @@ export default function Redactor() {
         const fontH = Math.abs(d) || it.height;
         for (const p of PATTERNS) {
           for (const m of it.str.matchAll(p.re)) {
-            const start = (m.index ?? 0) / it.str.length;
-            const len = m[0].length / it.str.length;
-            const x = e + it.width * start;
+            // 用 canvas 按真实字宽估算子串位置（比例字体下比按字符数准确得多）
+            const full = measure(it.str) || 1;
+            const start = measure(it.str.slice(0, m.index ?? 0)) / full;
+            const len = measure(m[0]) / full;
+            const pad = fontH * 0.25; // 两侧安全边距，宁多勿漏
+            const x = e + it.width * start - pad;
             const yTop = base.height - f - fontH; // PDF 坐标 y 轴向上，翻转
             boxes.push({
-              x: (x - 1) / base.width,
+              x: x / base.width,
               y: (yTop - fontH * 0.15) / base.height,
-              w: (it.width * len + 2) / base.width,
+              w: (it.width * len + pad * 2) / base.width,
               h: (fontH * 1.35) / base.height,
               auto: p.name,
             });
