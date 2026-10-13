@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description:
     "Free online PDF redaction tool. Black out text, emails, phone numbers and SSNs permanently. Runs 100% in your browser — your file is never uploaded.",
   alternates: { canonical: "/" },
+  verification: { google: "OzbbXwBKIAGRAIV-NCTTfkOO6b3YAXZjqWxCrmygypM" },
   openGraph: { title: "Redact PDF Online Free & Private", description: "Permanently black out sensitive info in PDFs. No upload.", type: "website" },
 };
 
