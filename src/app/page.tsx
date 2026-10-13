@@ -1,69 +1,70 @@
-import Image from "next/image";
+import Redactor from "@/components/Redactor";
+
+const faqs = [
+  ["Is my PDF uploaded to a server?", "No. Everything runs locally in your browser using JavaScript. Your document never leaves your device, so it is safe for contracts, medical records, tax forms and IDs."],
+  ["Is the redaction permanent?", "Yes. When you download, every page is flattened into an image with the black boxes burned in. The original text layer is removed, so redacted text cannot be copied, searched or recovered."],
+  ["Can it find personal information automatically?", "It scans the text for email addresses, phone numbers, US Social Security numbers and card numbers and boxes them for you. Always review the result and add boxes for names, addresses or signatures."],
+  ["How do I black out text in a PDF?", "Drop your PDF above, drag a rectangle over any text or image you want to hide, then click Download redacted PDF. Click a box to remove it."],
+  ["Is this redact PDF tool free?", "Yes, it is free with no sign-up, no watermark and no page limit."],
+  ["Does it work for scanned PDFs?", "Yes. Manual boxes work on any page, including scans. Auto-detect needs real text, so scanned images need manual boxes."],
+];
 
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebApplication", name: "Redact PDF", applicationCategory: "UtilitiesApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+      { "@type": "FAQPage", mainEntity: faqs.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+    ],
+  };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <header className="text-center">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Redact PDF Online — Free &amp; Private</h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
+          Black out text, emails, phone numbers and SSNs in any PDF. Runs entirely in your browser — your file is never uploaded.
+        </p>
+      </header>
+
+      <Redactor />
+
+      <section className="grid gap-6 sm:grid-cols-3">
+        {[
+          ["🔒 100% private", "No upload, no server, no account. Works offline once loaded."],
+          ["🤖 Auto-detect PII", "Finds emails, phone numbers, SSNs and card numbers in one click."],
+          ["⬛ True redaction", "Text under the box is permanently removed, not just covered."],
+        ].map(([t, d]) => (
+          <div key={t} className="rounded-xl bg-white p-5 shadow-sm">
+            <h2 className="font-semibold">{t}</h2>
+            <p className="mt-1 text-sm text-slate-600">{d}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="prose max-w-none">
+        <h2 className="text-2xl font-bold">How to redact a PDF for free</h2>
+        <ol className="mt-3 list-decimal space-y-1 pl-6 text-slate-700">
+          <li>Drop your PDF into the box above (or click to choose a file).</li>
+          <li>Review the automatically detected emails, phone numbers and IDs.</li>
+          <li>Drag over any other text, image or signature to black it out.</li>
+          <li>Click <b>Download redacted PDF</b>. Done — nothing was uploaded.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold">Frequently asked questions</h2>
+        <div className="mt-4 divide-y rounded-xl bg-white shadow-sm">
+          {faqs.map(([q, a]) => (
+            <details key={q} className="p-4">
+              <summary className="cursor-pointer font-medium">{q}</summary>
+              <p className="mt-2 text-slate-600">{a}</p>
+            </details>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      <footer className="border-t pt-6 text-center text-sm text-slate-500">© 2026 Redact PDF · Files are processed locally and never stored.</footer>
+    </main>
   );
 }
