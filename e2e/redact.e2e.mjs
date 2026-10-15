@@ -1,4 +1,4 @@
-// 端到端测试：上传 → 自动识别 → 手动框选 → 删除 → 导出 → 校验导出 PDF 已无敏感文字
+// 端到端测试：上传 / 示例加载 → 自动识别 → 关键词全页检索涂黑 → 手动框选 → 删除 → 导出 → 校验导出 PDF 已无敏感文字
 import { chromium } from "playwright-core";
 import { jsPDF } from "jspdf";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
@@ -25,8 +25,12 @@ const page = await browser.newPage({ acceptDownloads: true, viewport: { width: 1
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 
-await page.goto(URL);
+await page.goto(URL, { waitUntil: "domcontentloaded" });
 ok((await page.title()).includes("Redact PDF"), "页面标题正确");
+ok(await page.locator("header nav a").count() === 5, "顶部吸顶导航包含全部 5 个工具入口");
+
+const htmlContent = await page.content();
+ok(htmlContent.includes("G-8764ZP2KQ1") && htmlContent.includes("yxcpqk8xbw"), "GA4 与 Microsoft Clarity 统计脚本已激活");
 
 // 2. 上传
 await page.setInputFiles('input[type="file"]', "/tmp/e2e-in.pdf");
@@ -34,8 +38,6 @@ await page.waitForSelector('img[alt="Page 1"]', { timeout: 20000 });
 ok(await page.locator('img[alt^="Page"]').count() === 2, "渲染出 2 页");
 
 // 3. 自动识别计数
-const bar = await page.locator(".sticky").innerText();
-console.log("   工具栏:", bar.replace(/\s+/g, " "));
 const autoBoxes = await page.locator("[data-box]").count();
 ok(autoBoxes === 4, `自动识别 4 处（实际 ${autoBoxes}：2 邮箱 + 1 电话 + 1 SSN）`);
 await page.screenshot({ path: `${SHOTS}/1-auto.png` });
@@ -45,24 +47,21 @@ await page.getByLabel(/^Email/).uncheck();
 ok(await page.locator("[data-box]").count() === 2, "关闭 Email 后剩 2 框");
 await page.getByLabel(/^Email/).check();
 
-// 5. 手动拖拽框选第 1 页的 "BLUEBIRD" 一行
-const p1 = page.locator('img[alt="Page 1"]').locator("..");
-const bb = await p1.boundingBox();
-// jsPDF A4: 210mm 宽；y=70mm 处的文字，约在页面高度 70/297
-const y = bb.y + bb.height * (66 / 297), x0 = bb.x + bb.width * (15 / 210), x1 = bb.x + bb.width * (120 / 210);
-await page.mouse.move(x0, y - 8);
-await page.mouse.down();
-await page.mouse.move((x0 + x1) / 2, y + 2, { steps: 5 });
-await page.mouse.move(x1, y + 12, { steps: 5 });
-await page.mouse.up();
-ok(await page.locator("[data-box]").count() === 5, "手动拖拽新增 1 框（共 5）");
+// 5. 测试按关键词全页查找涂黑 ("BLUEBIRD")
+await page.getByLabel("Find and redact keyword").fill("BLUEBIRD");
+await page.getByRole("button", { name: "+ Redact All Matches" }).click();
+ok(await page.locator("[data-box]").count() === 5, "按关键词 BLUEBIRD 自动新增 1 处遮盖框（共 5）");
 
-// 6. 点击删除再重画（验证删除功能）
+// 6. 点击删除再手动拖拽框选（验证删除与手动框选功能）
+const p1 = page.locator('img[alt="Page 1"]').locator("..");
 await p1.locator("[data-box]").last().click();
 ok(await page.locator("[data-box]").count() === 4, "点击框后删除（回到 4）");
+
+const bb = await p1.boundingBox();
+const y = bb.y + bb.height * (66 / 297), x0 = bb.x + bb.width * (15 / 210), x1 = bb.x + bb.width * (120 / 210);
 await page.mouse.move(x0, y - 8); await page.mouse.down();
 await page.mouse.move(x1, y + 12, { steps: 8 }); await page.mouse.up();
-ok(await page.locator("[data-box]").count() === 5, "重新框选（共 5）");
+ok(await page.locator("[data-box]").count() === 5, "手动拖拽重新框选（共 5）");
 await page.screenshot({ path: `${SHOTS}/2-manual.png` });
 
 // 7. 导出下载
@@ -78,7 +77,11 @@ let text = "";
 for (let i = 1; i <= out.numPages; i++) text += (await (await out.getPage(i)).getTextContent()).items.map((t) => t.str).join(" ");
 ok(!/acme|555|6789|BLUEBIRD|jane/.test(text), `导出文件不含敏感文字（提取到 ${text.trim().length} 字符）`);
 
-// 9. 像素层面以截图人工复核（见 e2e-shots/）
+// 9. 验证全部 5 个 SEO 着陆页 + Sitemap
+for (const route of ["/black-out-text-in-pdf", "/remove-personal-information-from-pdf", "/redact-ssn-in-pdf", "/redact-bank-statement-pdf", "/sitemap.xml", "/robots.txt"]) {
+  const res = await page.goto(`${URL}${route}`, { waitUntil: "domcontentloaded" });
+  ok(res && res.status() === 200, `路由 ${route} 返回 HTTP 200`);
+}
 
 ok(errors.length === 0, `无页面 JS 错误${errors.length ? "：" + errors.join("; ") : ""}`);
 await browser.close();
