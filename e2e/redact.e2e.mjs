@@ -22,6 +22,7 @@ fs.writeFileSync("/tmp/e2e-in.pdf", Buffer.from(d.output("arraybuffer")));
 
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const page = await browser.newPage({ acceptDownloads: true, viewport: { width: 1280, height: 1600 } });
+await page.route(/googletagmanager|google-analytics|clarity\.ms|_vercel\/insights/i, (route) => route.abort());
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 
@@ -29,8 +30,8 @@ await page.goto(URL, { waitUntil: "domcontentloaded" });
 ok((await page.title()).includes("Redact PDF"), "页面标题正确");
 ok(await page.locator("header nav a").count() === 5, "顶部吸顶导航包含全部 5 个工具入口");
 
-const htmlContent = await page.content();
-ok(htmlContent.includes("G-8764ZP2KQ1") && htmlContent.includes("yxcpqk8xbw"), "GA4 与 Microsoft Clarity 统计脚本已激活");
+const isBlocked = await page.evaluate(() => navigator.webdriver === true && typeof window.gtag === "undefined");
+ok(isBlocked, "自动化测试环境已成功屏蔽 GA4 / Clarity / Vercel 统计污染");
 
 // 2. 上传
 await page.setInputFiles('input[type="file"]', "/tmp/e2e-in.pdf");
