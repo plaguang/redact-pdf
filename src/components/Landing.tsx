@@ -1,4 +1,5 @@
 import Redactor from "@/components/Redactor";
+import FeedbackBar from "@/components/FeedbackBar";
 import Link from "next/link";
 
 export type LandingProps = {
@@ -104,6 +105,8 @@ export default function Landing({ h1, lede, steps, faqs, path }: LandingProps) {
         </div>
 
         <Redactor />
+
+        <FeedbackBar toolName="PDF Redaction Tool" theme="light" />
 
         <section className="grid gap-5 sm:grid-cols-3">
           {[

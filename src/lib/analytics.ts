@@ -47,7 +47,10 @@ export type PdfEventName =
   | "pdf_demo_load"
   | "keyword_redact_add"
   | "manual_box_add"
-  | "download_redacted_pdf";
+  | "download_redacted_pdf"
+  | "user_feedback";
+
+export const trackToolEvent = trackPdfEvent;
 
 export function trackPdfEvent(
   event: PdfEventName,
@@ -69,6 +72,11 @@ export function trackPdfEvent(
   try {
     if (typeof window !== "undefined" && typeof window.clarity === "function") {
       window.clarity("event", event);
+      if (props) {
+        for (const [k, v] of Object.entries(props)) {
+          window.clarity("set", k, String(v));
+        }
+      }
     }
   } catch {
     // ignore
