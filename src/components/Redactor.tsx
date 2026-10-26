@@ -21,11 +21,12 @@ type RedactStyle = "black" | "white" | "stamp";
 
 const RENDER_SCALE = 2; // 渲染分辨率：越高导出越清晰
 
-// 自动识别的敏感信息规则（涵盖邮箱、电话、SSN、银行卡、日期与金额）
+// 自动识别的敏感信息规则（涵盖邮箱、电话、SSN、雇主税号 EIN、银行卡、日期与金额）
 const PATTERNS: { name: string; re: RegExp }[] = [
   { name: "Email", re: /[\w.+-]+@[\w-]+\.[\w.-]+/g },
   { name: "Phone", re: /(\+?\d{1,2}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g },
   { name: "SSN", re: /\b\d{3}-\d{2}-\d{4}\b/g },
+  { name: "EIN", re: /\b\d{2}-\d{7}\b/g },
   { name: "Card", re: /\b(?:\d[ -]?){13,16}\b/g },
   { name: "Date", re: /\b(?:0?[1-9]|1[0-2])\/(?:0?[1-9]|[12]\d|3[01])\/(?:19|20)\d{2}\b/g },
   { name: "Amount", re: /\$\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?\b/g },
@@ -47,6 +48,7 @@ export default function Redactor() {
     Email: true,
     Phone: true,
     SSN: true,
+    EIN: true,
     Card: true,
     Date: false,
     Amount: false,
