@@ -26,7 +26,7 @@ await page.route(/googletagmanager|google-analytics|clarity\.ms|_vercel\/insight
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 
-await page.goto(URL, { waitUntil: "domcontentloaded" });
+await page.goto(URL, { waitUntil: "networkidle" });
 ok((await page.title()).includes("Redact PDF"), "页面标题正确");
 ok(await page.locator("header nav a").count() === 5, "顶部吸顶导航包含全部 5 个工具入口");
 
