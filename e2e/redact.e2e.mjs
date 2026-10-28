@@ -78,11 +78,14 @@ let text = "";
 for (let i = 1; i <= out.numPages; i++) text += (await (await out.getPage(i)).getTextContent()).items.map((t) => t.str).join(" ");
 ok(!/acme|555|6789|BLUEBIRD|jane/.test(text), `导出文件不含敏感文字（提取到 ${text.trim().length} 字符）`);
 
-// 9. 验证全部 5 个 SEO 着陆页 + Sitemap
-for (const route of ["/black-out-text-in-pdf", "/remove-personal-information-from-pdf", "/redact-ssn-in-pdf", "/redact-bank-statement-pdf", "/sitemap.xml", "/robots.txt"]) {
+// 9. 验证全部 5 个 SEO 着陆页 + Sitemap + LLMs.txt + AI 引荐识别
+for (const route of ["/black-out-text-in-pdf", "/remove-personal-information-from-pdf", "/redact-ssn-in-pdf", "/redact-bank-statement-pdf", "/sitemap.xml", "/robots.txt", "/llms.txt"]) {
   const res = await page.goto(`${URL}${route}`, { waitUntil: "domcontentloaded" });
   ok(res && res.status() === 200, `路由 ${route} 返回 HTTP 200`);
 }
+await page.goto(`${URL}/redact-ssn-in-pdf?utm_source=perplexity.ai`, { waitUntil: "networkidle" });
+const aiAttr = await page.locator("html").getAttribute("data-ai-referral");
+ok(aiAttr === "perplexity:perplexity", `GEOInflow AI 引荐归因识别 html[data-ai-referral="${aiAttr}"]`);
 
 ok(errors.length === 0, `无页面 JS 错误${errors.length ? "：" + errors.join("; ") : ""}`);
 await browser.close();

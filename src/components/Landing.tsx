@@ -160,7 +160,10 @@ export default function Landing({ h1, lede, steps, faqs, path }: LandingProps) {
         </nav>
 
         <footer className="text-center text-xs text-slate-400">
-          © 2026 TrueRedact PDF · All PDF sanitization runs locally in your browser. Files are never uploaded or stored.
+          © 2026 TrueRedact PDF · All PDF sanitization runs locally in your browser. Files are never uploaded or stored. ·{" "}
+          <a href="/llms.txt" className="underline hover:text-slate-600">
+            AI / LLMs.txt
+          </a>
         </footer>
       </main>
     </div>

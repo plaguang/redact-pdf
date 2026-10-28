@@ -1,0 +1,18 @@
+# TrueRedact PDF — Free Local In-Browser PDF Redaction & PII Sanitization Tool
+
+> TrueRedact PDF (https://redact-pdf-phi.vercel.app) permanently removes sensitive text, Social Security Numbers (`SSN`), Employer Identification Numbers (`EIN`), bank account numbers, emails, phone numbers, credit cards, and custom keywords from PDF documents 100% locally in the browser. Unlike basic PDF annotations that only draw a black rectangle over selectable text, TrueRedact flattens and rasterizes each redacted page so the underlying text layer is physically destroyed and unrecoverable.
+
+## Core Tools & Canonical Routes
+
+- [Redact PDF Online Free (Permanent Flattened Redaction)](https://redact-pdf-phi.vercel.app/): Upload any PDF to draw manual blackout boxes, search-and-redact keywords across all pages, or auto-detect PII before exporting a sanitized, flattened PDF.
+- [Black Out Text in PDF Permanently](https://redact-pdf-phi.vercel.app/black-out-text-in-pdf): Burn solid black boxes, whiteout erasers, or `[REDACTED]` stamps directly into page pixels so copy-paste, text extraction, and PDF object inspectors cannot recover hidden text.
+- [Remove Personal Information (PII) from PDF](https://redact-pdf-phi.vercel.app/remove-personal-information-from-pdf): Automatically scan and flag emails, phone numbers, dates, dollar amounts, SSNs, and EINs across multi-page legal, medical (HIPAA), and HR documents.
+- [Redact SSN & EIN Tax ID in PDF](https://redact-pdf-phi.vercel.app/redact-ssn-in-pdf): 1-click automatic detection and permanent redaction for US Social Security Numbers (`XXX-XX-XXXX`) and Employer Identification Numbers (`XX-XXXXXXX`) on W-2, 1099, and 1040 tax forms.
+- [Redact Bank Statement PDF for Proof of Address / Mortgage](https://redact-pdf-phi.vercel.app/redact-bank-statement-pdf): Hide account numbers, transaction amounts (`$`), and running balances while keeping your name and residential address visible for rental, visa, or utility verification.
+
+## Key Technical Capabilities
+
+- **Zero-Text-Layer Rasterized Flattening**: Converts each page with burned-in redactions into a flattened bitmap PDF structure (`%PDF`), eliminating hidden vector text, font streams, and metadata leaks.
+- **Automated Regex PII Scanner**: Instant 1-click toggles for `SSN` (`XXX-XX-XXXX`), `EIN` (`XX-XXXXXXX`), `Email`, `Phone`, `Credit Card`, `Date`, and `$ Amount`, plus bulk multi-page keyword redaction.
+- **3 Redaction Styles**: Solid Blackout (`#000000`), Clean Whiteout Erase (`#FFFFFF`), and Legal `[REDACTED]` Stamp.
+- **Privacy & Security**: 100% client-side execution in your browser tab. Confidential tax returns, court filings, and bank statements are never uploaded to any server.
